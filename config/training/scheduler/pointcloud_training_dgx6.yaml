@@ -1,0 +1,9 @@
+#_target_: torch.optim.lr_scheduler.StepLR
+#_partial_: true
+#step_size: 500
+#gamma: 0.5
+#last_epoch: -1
+_target_: torch.optim.lr_scheduler.CosineAnnealingLR
+_partial_: true
+T_max: 100
+eta_min: 1e-6

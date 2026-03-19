@@ -1,0 +1,28 @@
+# In your config file
+visualize_scalar: true
+scalar_range: [-1.0, 1.0]  # Min and max values for random generation
+smoothing_operators:
+  - _target_: neural_laplacian.convolutions.ScalarFieldSmoothing
+    aggr: "add"
+    sigma: 0.8
+    normalize_weights: true
+
+  - _target_: neural_laplacian.convolutions.ScalarFieldSmoothing
+    aggr: "add"
+    sigma: 1.5
+    normalize_weights: true
+
+  - _target_: neural_laplacian.convolutions.ScalarFieldSmoothing
+    aggr: "add"
+    sigma: 3.0
+    normalize_weights: true
+
+  - _target_: neural_laplacian.convolutions.ScalarFieldSmoothing
+    aggr: "add"
+    sigma: 3.0
+    normalize_weights: true
+
+  - _target_: neural_laplacian.convolutions.ScalarFieldSmoothing
+    aggr: "add"
+    sigma: 3.0
+    normalize_weights: true

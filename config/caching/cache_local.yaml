@@ -1,0 +1,9 @@
+mesh_folders:
+  - "./assets/camel-poses"
+  - "./assets/lion-poses"
+  - "./assets/face-poses"
+cache_dir: "./eigen_cache/poses"
+num_eigenfunctions: 80
+num_workers: 8
+min_file_size_mb: 0
+max_file_size_mb: 7

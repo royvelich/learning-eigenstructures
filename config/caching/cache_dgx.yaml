@@ -1,0 +1,23 @@
+mesh_folders:
+#  - "/workspace/datasets/med-shapenet"
+#  - "/workspace/datasets/abc"
+#  - "/workspace/datasets/faust"
+#  - "/workspace/datasets/deftransfer"
+#  - "/workspace/datasets/shrec07"
+#  - "/workspace/datasets/shrec14"
+#  - "/workspace/datasets/shrec15"
+#  - "/workspace/datasets/shrec19"
+#  - "/workspace/datasets/shrec20"
+#  - "/workspace/datasets/mpz14"
+#  - "/workspace/datasets/rna"
+#  - "/workspace/datasets/thingi10k"
+#  - "/workspace/datasets/toys4k"
+#  - "/workspace/datasets/topkids"
+#  - "/workspace/datasets/shrec21"
+#  - "/workspace/datasets/shrec20b"
+  - "/workspace/datasets/deforming-things-4d"
+cache_dir: "/workspace/Github/NeuralOperators/eigen_cache_unit_sphere"
+num_eigenfunctions: 80
+num_workers: 16
+min_file_size_mb: 0
+max_file_size_mb: 7

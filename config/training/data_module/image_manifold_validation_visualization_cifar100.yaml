@@ -1,0 +1,100 @@
+_dataset_: &exp_dataset_config
+  _target_: neural_laplacian.datasets.ImageManifoldDataset
+  files_path_cache: null
+  scalar_field_config:
+    _target_: neural_laplacian.configs.ScalarFieldConfig
+    generators:
+      - _target_: neural_laplacian.generators.UniformFieldGenerator
+        min_val_range: [-1, 1]
+        max_val_range: null
+        num_fields: 300
+  num_workers: 5
+
+_exp_train_dataset_config_: &exp_train_dataset_config
+  <<: *exp_dataset_config
+  max_items: null
+  file_size: null
+  deterministic_sampling: False
+  name: 'cifar100_train'
+  labels_pkl_path: null
+  sampling_config:
+    _target_: neural_laplacian.configs.UniformSamplingConfig
+    samples: 1500
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["F:/cifar100/images/train"]
+  batches: 256
+
+_exp_val_dataset_config1_: &exp_val_dataset_config1
+  <<: *exp_dataset_config
+  max_items: null
+  file_size: null
+  deterministic_sampling: True
+  name: 'cifar100_test'
+  labels_pkl_path: './assets/cifar100_test_mapping.pkl'
+  sampling_config:
+    _target_: neural_laplacian.configs.ClassWeightedSamplingConfig
+    samples: 1500
+    labels_pkl_path: './assets/cifar100_test_mapping.pkl'
+    class_weights:
+      _target_: neural_laplacian.configs.RandomWeights
+      entropy_range: [0.01, 0.1]
+#  sampling_config:
+#    _target_: neural_laplacian.configs.UniformSamplingConfig
+#    samples: 1200
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["F:/cifar100/images/test"]
+  batches: 32
+
+#_exp_val_dataset_config2_: &exp_val_dataset_config2
+#  <<: *exp_dataset_config
+#  max_items: null
+#  file_size: null
+#  name: '102flowers_test'
+#  sampling_config:
+#    _target_: neural_laplacian.configs.ClassWeightedSamplingConfig
+#    samples: 1000
+#    labels_pkl_path: './assets/102flowers_mapping.pkl'
+#    class_weights:
+#      _target_: neural_laplacian.configs.RandomWeights
+#      entropy_range: [0.01, 0.5]
+#  root_dirs:
+#    - _target_: pathlib.Path
+#      _args_: ["/workspace/datasets/102flowers/test"]
+#  batches: 8
+
+module:
+  _target_: neural_laplacian.data_modules.DataModule
+  train_dataset_specification:
+    _target_: neural_laplacian.data_modules.DatasetSpecification
+    dataset: *exp_train_dataset_config
+    batch_size: 4
+    num_workers: 0
+#    num_workers: 0
+    shuffle: True
+#    persistent_workers: False
+    persistent_workers: False
+    pin_memory: False
+    drop_last: True
+  val_dataset_specifications:
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config1
+      batch_size: 1
+      num_workers: 0
+#      num_workers: 0
+      shuffle: False
+#      persistent_workers: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: True
+#    - _target_: neural_laplacian.data_modules.DatasetSpecification
+#      dataset: *exp_val_dataset_config2
+#      batch_size: 1
+#      num_workers: 0
+##      num_workers: 0
+#      shuffle: False
+##      persistent_workers: False
+#      persistent_workers: False
+#      pin_memory: False
+#      drop_last: True

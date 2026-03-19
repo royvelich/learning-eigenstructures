@@ -1,0 +1,11 @@
+seed: 60
+eigenvectors_count: 50
+ckpt_path: null
+mesh_path: "./assets/overfit_validation/laurent_hand"
+#mesh_path: null
+operator:
+  _target_: neural_laplacian.configs.OperatorConfig
+  type: schrodinger
+  potential_type: curvature
+  potential_strength: 1.0
+  n_neighbors: 50

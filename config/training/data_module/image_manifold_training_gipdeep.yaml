@@ -1,0 +1,62 @@
+_dataset_: &exp_dataset_config
+  _target_: neural_laplacian.datasets.ImageManifoldDataset
+  scalar_field_config:
+    _target_: neural_laplacian.configs.ScalarFieldConfig
+    generators:
+      - _target_: neural_laplacian.generators.UniformFieldGenerator
+        min_val_range: [-1, 1]
+        max_val_range: null
+        num_fields: 200
+  num_workers: 5
+_exp_train_dataset_config_: &exp_train_dataset_config
+  <<: *exp_dataset_config
+  max_items: null
+  file_size: null
+  uniform_sampling_config:
+    _target_: neural_laplacian.configs.UniformSamplingConfig
+    number_of_samples: 1000
+#    number_of_samples: 500
+    perc_of_samples: null
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/home/royve/datasets/stl10/unlabeled"]
+#      _args_: ["F:/stl10/unlabeled"]
+  batches: 16
+_exp_val_dataset_config_: &exp_val_dataset_config
+  <<: *exp_dataset_config
+  max_items: null
+  file_size: null
+  uniform_sampling_config:
+    _target_: neural_laplacian.configs.UniformSamplingConfig
+    number_of_samples: 1000
+#    number_of_samples: 500
+    perc_of_samples: null
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/home/royve/datasets/stl10/test"]
+#      _args_: ["F:/stl10/test"]
+  batches: 2
+module:
+  _target_: neural_laplacian.data_modules.DataModule
+  train_dataset_specification:
+    _target_: neural_laplacian.data_modules.DatasetSpecification
+    dataset: *exp_train_dataset_config
+    batch_size: 1
+    num_workers: 6
+#    num_workers: 0
+    shuffle: True
+#    persistent_workers: False
+    persistent_workers: True
+    pin_memory: True
+    drop_last: True
+  val_dataset_specifications:
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config
+      batch_size: 1
+      num_workers: 2
+#      num_workers: 0
+      shuffle: False
+#      persistent_workers: False
+      persistent_workers: True
+      pin_memory: True
+      drop_last: True

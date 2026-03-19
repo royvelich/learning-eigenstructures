@@ -1,0 +1,10 @@
+-r requirements.txt
+--extra-index-url https://download.pytorch.org/whl/cu128
+torch==2.8.0
+torchvision==0.23.0
+torchaudio==2.8.0
+
+--find-links https://data.pyg.org/whl/torch-2.8.0+cu128.html
+torch-scatter
+torch-sparse
+torch-cluster

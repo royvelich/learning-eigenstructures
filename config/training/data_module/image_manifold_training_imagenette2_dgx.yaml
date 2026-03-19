@@ -1,0 +1,62 @@
+_dataset_: &exp_dataset_config
+  _target_: neural_laplacian.datasets.ImageManifoldDataset
+  files_path_cache: null
+  scalar_field_config:
+    _target_: neural_laplacian.configs.ScalarFieldConfig
+    generators:
+      - _target_: neural_laplacian.generators.UniformFieldGenerator
+        min_val_range: [-1, 1]
+        max_val_range: null
+        num_fields: 300
+  num_workers: 5
+
+_exp_train_dataset_config_: &exp_train_dataset_config
+  <<: *exp_dataset_config
+  max_items: null
+  file_size: null
+  deterministic_sampling: False
+  name: 'imagenette2_train'
+  labels_pkl_path: null
+  sampling_config:
+    _target_: neural_laplacian.configs.UniformSamplingConfig
+    samples: 5000
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/imagenette2/train"]
+  batches: 128
+
+_exp_val_dataset_config1_: &exp_val_dataset_config1
+  <<: *exp_dataset_config
+  max_items: null
+  file_size: null
+  deterministic_sampling: True
+  name: 'imagenette2_val'
+  labels_pkl_path: './assets/imagenette2_val_mapping.pkl'
+  sampling_config:
+    _target_: neural_laplacian.configs.UniformSamplingConfig
+    samples: 5000
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/imagenette2/val"]
+  batches: 16
+
+module:
+  _target_: neural_laplacian.data_modules.DataModule
+  train_dataset_specification:
+    _target_: neural_laplacian.data_modules.DatasetSpecification
+    dataset: *exp_train_dataset_config
+    batch_size: 1
+    num_workers: 0
+    shuffle: True
+    persistent_workers: False
+    pin_memory: False
+    drop_last: True
+  val_dataset_specifications:
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config1
+      batch_size: 1
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: True

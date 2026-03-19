@@ -1,0 +1,69 @@
+# ARAP Playground Configuration
+defaults:
+  - _self_
+
+# Data configuration
+data:
+  path: "cactus.obj"  # Path to mesh file or validation dataset directory
+  mode: "mesh"  # "mesh" or "validation"
+
+# Mesh processing configuration
+mesh:
+  normalize_to_unit_area: true
+  apply_principal_axis_alignment: true
+
+# Validation dataset configuration
+validation:
+  use_random_weights: false  # Use random weights instead of spectral approximation
+  knn_k: 20  # Number of nearest neighbors for k-NN graph
+  random_weight_range: [0.1, 2.0]  # Range for random weights if enabled
+
+# Constraint vertices configuration
+constraints:
+  # Fixed vertices (red) - vertices that remain at original positions
+  fixed_indices: [619]
+
+  # Handle vertices (blue) - vertices that will be moved during animation
+  handle_indices: [504]
+
+  # Fallback ratios if indices are out of bounds (as fractions of total vertices)
+  fixed_fallback_ratio: 0.25    # 1/4 of mesh
+  handle_fallback_ratio: 0.75   # 3/4 of mesh
+
+# Animation configuration
+animation:
+  n_frames: 120
+  initial_mode: "rotation"  # "rotation" or "translation"
+  initial_axis: "z"  # "x", "y", or "z"
+
+  # Animation parameters
+  max_angle: 1.047  # ~60 degrees in radians (π/3)
+  max_displacement: 0.3
+
+# ARAP deformation configuration
+arap:
+  max_iterations: 10
+  tolerance: 1e-6
+  device: "cuda"  # "cuda" or "cpu"
+
+# Visualization configuration
+visualization:
+  up_dir: "z_up"  # "z_up", "y_up", "x_up"
+  ground_plane_mode: "none"  # "none", "shadow", "tile"
+  background_color: [0.0, 0.0, 0.0]  # RGB values
+
+  # Point cloud visualization
+  fixed_vertex_color: [1.0, 0.0, 0.0]  # Red
+  handle_vertex_color: [0.0, 0.0, 1.0]  # Blue
+  constraint_vertex_radius: 0.02
+
+  # Mesh visualization
+  edge_width: 1.0
+  edge_color: [0.0, 0.0, 0.0]  # Black
+
+# Debug/logging configuration
+debug:
+  print_mesh_info: true
+  print_constraint_info: true
+  print_laplacian_stats: true
+  print_weight_stats: true

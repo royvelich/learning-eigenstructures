@@ -1,0 +1,5 @@
+seed: 60
+eigenvectors_count: 50
+ckpt_path: null
+mesh_path: "./assets/overfit_validation/botijo"
+#mesh_path: null

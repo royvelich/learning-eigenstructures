@@ -1,0 +1,5 @@
+mesh_folders:
+  - "/home/royve/datasets/neural-laplacian/categories"
+cache_dir: "./eigen_cache"
+num_eigenfunctions: 200
+num_workers: 16

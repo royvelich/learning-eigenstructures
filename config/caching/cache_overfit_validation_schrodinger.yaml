@@ -1,0 +1,14 @@
+mesh_folders:
+  - "./assets/overfit_validation"
+#  - "./assets/teddy"
+cache_dir: "./eigen_cache/overfit_validation_schrodinger"
+num_eigenfunctions: 50
+num_workers: 8
+min_file_size_mb: 0
+max_file_size_mb: 100
+operator:
+  _target_: neural_laplacian.configs.OperatorConfig
+  type: schrodinger
+  potential_type: curvature
+  potential_strength: 2.0
+  n_neighbors: 50

@@ -1,0 +1,69 @@
+module:
+  _target_: neural_laplacian.modules.laplacian_modules.LaplacianPredictorModuleImageManifold
+  spectral_clustering_k_values: [2, 5, 10]
+#  manifold_learning_methods: ['pca', 'isomap', 'umap']
+  manifold_learning_methods: []
+  eigenmaps_methods: null
+  metric_activation: null
+  knn_graph_config:
+    _target_: neural_laplacian.configs.KnnGraphConfig
+    k: 20
+    loop: True
+    cosine: True
+  reconstruction_loss:
+    _target_: neural_laplacian.losses.ReconstructionLoss
+    max_eigenvectors: ${globals.eigenvectors_count}
+    use_normalized_laplacian: True
+    use_weighted_norm: False
+  scalar_field_smoother:
+    _target_: neural_laplacian.convolutions.ScalarFieldSmoother
+    sigma: 0.04
+    normalize_weights: True
+    iterations: 20
+    cosine: True
+    aggr: 'add'
+  point_features_module:
+    _target_: neural_laplacian.modules.laplacian_modules.PointFeaturesModule
+    pos_type:
+      _target_: neural_laplacian.modules.laplacian_modules.PosType
+      _args_: ["FEATURES"]
+    feature_extractors:
+#      - _target_: neural_laplacian.features.DINOFeatureExtractor
+#        model_name: 'facebook/dinov2-small'
+#        normalize_features: False
+#        use_cls_token: False
+      - _target_: neural_laplacian.features.CLIPFeatureExtractor
+        model_name: 'openai/clip-vit-base-patch32'
+        normalize_features: False
+#      - _target_: neural_laplacian.features.ResNet50FeatureExtractor
+#        model_name: 'microsoft/resnet-50'
+#        normalize_features: False
+#        pooling_type: 'max'
+
+#    preprocess_mlp: null
+    preprocess_mlp:
+      _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+      channels: [512, 256]
+      use_batch_norm: False
+      use_layer_norm: True
+      activation: torch.nn.GELU
+    core_modules:
+      - _target_: neural_laplacian.modules.architectures.ConfigurableTransformer
+        transformer_encoder_layer:
+          _target_: torch.nn.TransformerEncoderLayer
+          d_model: 256
+          nhead: 8
+          dim_feedforward: 256
+          activation:
+            _target_: torch.nn.GELU
+          batch_first: True
+          dropout: 0.1
+        num_layers: 6
+    postprocess_mlp: null
+  eigenvectors_mlp:
+    _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+    channels: [256, 64, "${globals.eigenvectors_count}"]
+    use_batch_norm: False
+    use_layer_norm: True
+    activation: torch.nn.GELU
+  pooling: null

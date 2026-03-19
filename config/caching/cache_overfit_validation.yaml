@@ -1,0 +1,7 @@
+mesh_folders:
+  - "./assets/overfit_validation"
+cache_dir: "./eigen_cache/overfit_validation"
+num_eigenfunctions: 80
+num_workers: 8
+min_file_size_mb: 0
+max_file_size_mb: 100

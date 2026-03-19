@@ -1,0 +1,9 @@
+mesh_folders:
+  - "./assets/retinal"
+#  - "./assets/teddy"
+cache_dir: "./eigen_cache/overfit_validation_hadamard"
+num_eigenfunctions: 50
+num_workers: 8
+min_file_size_mb: 0
+max_file_size_mb: 100
+operator: null

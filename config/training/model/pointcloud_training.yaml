@@ -1,0 +1,109 @@
+module:
+  _target_: neural_laplacian.modules.laplacian_modules.LaplacianPredictorModule3D
+  metric_activation: null
+  knn_graph_config:
+    _target_: neural_laplacian.configs.KnnGraphConfig
+    k: 10
+    loop: True
+    cosine: False
+  reconstruction_loss:
+    _target_: neural_laplacian.losses.ReconstructionLoss
+    max_eigenvectors: ${globals.eigenvectors_count}
+    projection_method:
+      _target_: neural_laplacian.utils.ProjectionMethod
+      _args_: ["whitened"]
+    use_weighted_norm: False
+  scalar_field_smoother:
+    _target_: neural_laplacian.convolutions.ScalarFieldSmoother
+    sigma: [0.01, 0.2]
+    normalize_weights: True
+    iterations: 40
+    cosine: False
+    aggr: 'add'
+  point_features_module:
+    _target_: neural_laplacian.modules.laplacian_modules.PointFeaturesModule
+    pos_type:
+      _target_: neural_laplacian.modules.laplacian_modules.PosType
+      _args_: ["POINTS"]
+    feature_extractors: null
+#    feature_extractors:
+#        - _target_: neural_laplacian.features.FourierFeatureExtractor
+#          fourier_scale: 3.0
+#          num_fourier_features: 128
+#        - _target_: neural_laplacian.features.PolynomialEncodings
+#          polynomial_degree: 2
+#    preprocess_mlp: null
+    preprocess_mlp:
+      _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+      channels: [3, 32, 128, 256]
+      use_batch_norm: False
+      use_layer_norm: True
+      activation: torch.nn.GELU
+    core_modules:
+      - _target_: neural_laplacian.modules.architectures.ConfigurableTransformer
+        transformer_encoder_layer:
+          _target_: torch.nn.TransformerEncoderLayer
+          d_model: 256
+          nhead: 8
+          dim_feedforward: 256
+          activation:
+            _target_: torch.nn.GELU
+          batch_first: True
+          dropout: 0.0
+        num_layers: 8
+
+#      - _target_: neural_laplacian.modules.architectures.ConfigurableGNN
+#        mlp_layers:
+#           - _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+#             channels: [512, 512, 512]
+#             use_batch_norm: False
+#             use_layer_norm: True
+#             activation: torch.nn.GELU
+#           - _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+#             channels: [512, 512, 512]
+#             use_batch_norm: False
+#             use_layer_norm: True
+#             activation: torch.nn.GELU
+#           - _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+#             channels: [512, 512, 512]
+#             use_batch_norm: False
+#             use_layer_norm: True
+#             activation: torch.nn.GELU
+#           - _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+#             channels: [512, 512, 512]
+#             use_batch_norm: False
+#             use_layer_norm: True
+#             activation: torch.nn.GELU
+#        conv_layers:
+#          - _target_: torch_geometric.nn.conv.TransformerConv
+#            in_channels: 512
+#            out_channels: 32
+#            heads: 16
+#            concat: True
+#          - _target_: torch_geometric.nn.conv.TransformerConv
+#            in_channels: 512
+#            out_channels: 32
+#            heads: 16
+#            concat: True
+#          - _target_: torch_geometric.nn.conv.TransformerConv
+#            in_channels: 512
+#            out_channels: 32
+#            heads: 16
+#            concat: True
+#          - _target_: torch_geometric.nn.conv.TransformerConv
+#            in_channels: 512
+#            out_channels: 32
+#            heads: 16
+#            concat: True
+#        k: 30
+#        recompute_knn: False
+#        concat_residual: True
+
+    postprocess_mlp: null
+  eigenvectors_mlp:
+    _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+    channels: [256, "${globals.eigenvectors_count}"]
+    use_batch_norm: False
+    use_layer_norm: True
+    activation: torch.nn.GELU
+  pooling: null

@@ -1,0 +1,88 @@
+# Define base dataset configuration
+_dataset_: &exp_dataset_config
+  _target_: neural_laplacian.datasets.PointCloudDataset
+  samples_count: 1
+  num_eigenfunctions: ${globals.eigenvectors_count}
+  scalar_field_config:
+    _target_: neural_laplacian.configs.ScalarFieldConfig
+    generators:
+      - _target_: neural_laplacian.generators.UniformFieldGenerator
+        min_val_range: [-1, 1]
+        max_val_range: null
+        num_fields: 500
+  gaussian_noise_config: null
+  decimation_config: null
+  feature_extractor: null
+  normal_estimation_config: null
+  remeshing_config: null
+
+_exp_train_dataset_config_: &exp_train_dataset_config
+  <<: *exp_dataset_config
+  max_items: 5000
+  min_file_size: 0.1
+  max_file_size: 15
+  replications: 1
+#  farthest_point_sampling_config: null
+  farthest_point_sampling_config:
+    _target_: neural_laplacian.configs.FarthestPointSamplingConfig
+    number_of_samples: [1000, 2000]
+    perc_of_samples: null
+    random_start: True
+  decimation_config: null
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/home/royve/datasets/neural-laplacian/deftransfer"]
+    - _target_: pathlib.Path
+      _args_: ["/home/royve/datasets/neural-laplacian/shrec07"]
+    - _target_: pathlib.Path
+      _args_: ["/home/royve/datasets/neural-laplacian/shrec15"]
+    - _target_: pathlib.Path
+      _args_: ["/home/royve/datasets/neural-laplacian/shrec19"]
+#  root_dirs:
+#    - _target_: pathlib.Path
+#      _args_: ["./assets/camel-poses"]
+#    - _target_: pathlib.Path
+#      _args_: ["./assets/lion-poses"]
+#    - _target_: pathlib.Path
+#      _args_: ["./assets/cat-poses"]
+#    - _target_: pathlib.Path
+#      _args_: ["./assets/elephant-poses"]
+#    - _target_: pathlib.Path
+#      _args_: ["./assets/flamingo-poses"]
+#    - _target_: pathlib.Path
+#      _args_: ["./assets/horse-poses"]
+#    - _target_: pathlib.Path
+#      _args_: ["./assets/shrec"]
+# Define validation dataset configuration with root_dirs
+_exp_val_dataset_config_: &exp_val_dataset_config
+  <<: *exp_dataset_config
+  max_items: null
+  min_file_size: 0
+  max_file_size: 5
+  replications: 1
+#  farthest_point_sampling_config: null
+  farthest_point_sampling_config:
+    _target_: neural_laplacian.configs.FarthestPointSamplingConfig
+    number_of_samples: 1500
+    perc_of_samples: null
+    random_start: True
+  decimation_config: null
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/home/royve/datasets/neural-laplacian/validation"]
+
+# Main DataModule configuration
+module:
+  _target_: neural_laplacian.data_modules.DataModule
+  train_dataset_specification:
+    _target_: neural_laplacian.data_modules.DatasetSpecification
+    dataset: *exp_train_dataset_config
+    batch_size: 10
+    num_workers: 0
+    shuffle: True
+  val_dataset_specifications:
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config
+      batch_size: 1
+      num_workers: 0
+      shuffle: False

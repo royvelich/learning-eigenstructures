@@ -1,0 +1,10 @@
+#_target_: torch.optim.lr_scheduler.StepLR
+#_partial_: true
+#step_size: 500
+#gamma: 0.5
+#last_epoch: -1
+_target_: torch.optim.lr_scheduler.CosineAnnealingWarmRestarts
+_partial_: true
+T_0: 60
+T_mult: 1
+eta_min: 1e-6

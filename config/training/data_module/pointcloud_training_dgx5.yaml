@@ -1,0 +1,194 @@
+# Define base dataset configuration
+_dataset_: &exp_dataset_config
+  _target_: neural_laplacian.datasets.PointCloudDataset
+  num_eigenfunctions: ${globals.eigenvectors_count}
+  cache_dir: "./eigen_cache_unit_sphere"
+  scalar_field_config:
+    _target_: neural_laplacian.configs.ScalarFieldConfig
+    generators:
+      - _target_: neural_laplacian.generators.UniformFieldGenerator
+        min_val_range: [-1, 1]
+        max_val_range: null
+        num_fields: 500
+  gaussian_noise_config: null
+  decimation_config: null
+  remeshing_config: null
+
+_exp_train_dataset_config_: &exp_train_dataset_config
+  <<: *exp_dataset_config
+  files_path_cache: "train_dgx"
+  max_items: 200000
+  file_size: [0.2, 7]
+  name: null
+#  farthest_point_sampling_config: null
+  farthest_point_sampling_config:
+    _target_: neural_laplacian.configs.FarthestPointSamplingConfig
+    samples: 1500
+    random_start: True
+  decimation_config: null
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/rna"]
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/shrec21"]
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/faust"]
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/abc"]
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/deforming-things-4d"]
+
+#    - _target_: pathlib.Path
+#      _args_: ["/workspace/datasets/med-shapenet"]
+
+_exp_val_dataset_config_: &exp_val_dataset_config
+  <<: *exp_dataset_config
+  files_path_cache: "val_dgx"
+  max_items: null
+  file_size: [0, 7]
+  name: null
+  farthest_point_sampling_config:
+    _target_: neural_laplacian.configs.FarthestPointSamplingConfig
+    samples: 1500
+    random_start: False
+  decimation_config: null
+
+_exp_val_dataset_config_mpz14_: &exp_val_dataset_config_mpz14
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/mpz14"]
+
+_exp_val_dataset_config_shrec07_: &exp_val_dataset_config_shrec07
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/shrec07"]
+
+_exp_val_dataset_config_shrec14_: &exp_val_dataset_config_shrec14
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/shrec14"]
+
+_exp_val_dataset_config_shrec15_: &exp_val_dataset_config_shrec15
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/shrec15"]
+
+_exp_val_dataset_config_shrec19_: &exp_val_dataset_config_shrec19
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/shrec19"]
+
+_exp_val_dataset_config_shrec20_: &exp_val_dataset_config_shrec20
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/shrec20"]
+
+_exp_val_dataset_config_deftransfer_: &exp_val_dataset_config_deftransfer
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/deftransfer"]
+
+_exp_val_dataset_config_topkids_: &exp_val_dataset_config_topkids
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/topkids"]
+
+_exp_val_dataset_config_shrec20b_: &exp_val_dataset_config_shrec20b
+  <<: *exp_val_dataset_config
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["/workspace/datasets/shrec20b"]
+
+
+module:
+  _target_: neural_laplacian.data_modules.DataModule
+  train_dataset_specification:
+    _target_: neural_laplacian.data_modules.DatasetSpecification
+    dataset: *exp_train_dataset_config
+    batch_size: 30
+    num_workers: 7
+    shuffle: True
+    persistent_workers: False
+    pin_memory: False
+    drop_last: True
+  val_dataset_specifications:
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_mpz14
+      batch_size: 5
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_shrec07
+      batch_size: 5
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_shrec14
+      batch_size: 5
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_shrec15
+      batch_size: 5
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_shrec19
+      batch_size: 5
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_shrec20
+      batch_size: 5
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_shrec20b
+      batch_size: 1
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_deftransfer
+      batch_size: 5
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config_topkids
+      batch_size: 1
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: False

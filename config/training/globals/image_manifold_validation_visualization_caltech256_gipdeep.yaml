@@ -1,0 +1,3 @@
+seed: 150
+eigenvectors_count: 11
+ckpt_path: "/home/royve/models_images/caltech256_dino.ckpt"

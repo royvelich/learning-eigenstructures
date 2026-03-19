@@ -1,0 +1,194 @@
+program: ./train.py
+command:
+  - python
+  - ${program}
+method: grid
+parameters:
+  globals:
+    parameters:
+      sigma:
+        values:
+          - 0.2
+          - 0.3
+          - 0.4
+      k:
+        values:
+          - 20
+          - 30
+      iterations:
+        values:
+          - 20
+          - 40
+          - 60
+      seed:
+        value: 6
+      eigenvectors_count:
+        value: 11
+      ckpt_path:
+        value: null
+  data_module:
+    value:
+      module:
+        _target_: neural_laplacian.data_modules.DataModule
+        train_dataset_specification:
+          _target_: neural_laplacian.data_modules.DatasetSpecification
+          dataset:
+            _target_: neural_laplacian.datasets.ImageManifoldDataset
+            files_path_cache: null
+            scalar_field_config:
+              _target_: neural_laplacian.configs.ScalarFieldConfig
+              generators:
+                - _target_: neural_laplacian.generators.UniformFieldGenerator
+                  min_val_range: [-1, 1]
+                  max_val_range: null
+                  num_fields: 600
+            num_workers: 5
+            max_items: null
+            file_size: null
+            deterministic_sampling: False
+            name: 'caltech256_train'
+            labels_pkl_path: null
+            sampling_config:
+              _target_: neural_laplacian.configs.UniformSamplingConfig
+              samples: 1500
+            root_dirs:
+              - _target_: pathlib.Path
+                _args_: ["/workspace/datasets/caltech256/train"]
+            batches: 128
+          batch_size: 1
+          num_workers: 0
+          shuffle: True
+          persistent_workers: False
+          pin_memory: False
+          drop_last: True
+        val_dataset_specifications:
+          - _target_: neural_laplacian.data_modules.DatasetSpecification
+            dataset:
+              _target_: neural_laplacian.datasets.ImageManifoldDataset
+              files_path_cache: null
+              scalar_field_config:
+                _target_: neural_laplacian.configs.ScalarFieldConfig
+                generators:
+                  - _target_: neural_laplacian.generators.UniformFieldGenerator
+                    min_val_range: [-1, 1]
+                    max_val_range: null
+                    num_fields: 600
+              num_workers: 5
+              max_items: null
+              file_size: null
+              deterministic_sampling: True
+              name: 'caltech256_val'
+              labels_pkl_path: './assets/caltech256_val_mapping.pkl'
+              sampling_config:
+                _target_: neural_laplacian.configs.UniformSamplingConfig
+                samples: 1500
+              root_dirs:
+                - _target_: pathlib.Path
+                  _args_: ["/workspace/datasets/caltech256/val"]
+              batches: 16
+            batch_size: 1
+            num_workers: 0
+            shuffle: False
+            persistent_workers: False
+            pin_memory: False
+            drop_last: True
+
+  model:
+    value:
+      module:
+        _target_: neural_laplacian.modules.laplacian_modules.LaplacianPredictorModuleImageManifold
+        spectral_clustering_k_values: [2, 5, 10]
+      #  manifold_learning_methods: ['pca', 'isomap', 'umap']
+        manifold_learning_methods: []
+        eigenmaps_methods: null
+        metric_activation: null
+        knn_graph_config:
+          _target_: neural_laplacian.configs.KnnGraphConfig
+          k: ${globals.k}
+          loop: True
+          cosine: True
+        reconstruction_loss:
+          _target_: neural_laplacian.losses.ReconstructionLoss
+          max_eigenvectors: ${globals.eigenvectors_count}
+          use_normalized_laplacian: True
+          use_weighted_norm: False
+        scalar_field_smoother:
+          _target_: neural_laplacian.convolutions.ScalarFieldSmoother
+          sigma: ${globals.sigma}
+          normalize_weights: True
+          iterations: ${globals.iterations}
+          cosine: True
+          aggr: 'add'
+        point_features_module:
+          _target_: neural_laplacian.modules.laplacian_modules.PointFeaturesModule
+          pos_type:
+            _target_: neural_laplacian.modules.laplacian_modules.PosType
+            _args_: ["FEATURES"]
+          feature_extractors:
+            - _target_: neural_laplacian.features.DINOFeatureExtractor
+              model_name: 'facebook/dinov2-small'
+              normalize_features: False
+              use_cls_token: False
+          preprocess_mlp:
+            _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+            channels: [384, 128]
+            use_batch_norm: False
+            use_layer_norm: True
+            activation: torch.nn.GELU
+          core_modules:
+            - _target_: neural_laplacian.modules.architectures.ConfigurableTransformer
+              transformer_encoder_layer:
+                _target_: torch.nn.TransformerEncoderLayer
+                d_model: 128
+                nhead: 4
+                dim_feedforward: 128
+                activation:
+                  _target_: torch.nn.GELU
+                batch_first: True
+                dropout: 0.1
+              num_layers: 6
+          postprocess_mlp: null
+        eigenvectors_mlp:
+          _target_: neural_laplacian.modules.architectures.ConfigurableMLP
+          channels: [128, "${globals.eigenvectors_count}"]
+          use_batch_norm: False
+          use_layer_norm: True
+          activation: torch.nn.GELU
+        pooling: null
+
+  optimizer:
+    value:
+      _target_: torch.optim.AdamW
+      _partial_: true
+      lr: 5e-4
+
+  trainer:
+    value:
+      _target_: lightning.pytorch.Trainer
+      max_epochs: 20
+      devices: -1
+      accelerator: 'auto'
+      strategy: 'ddp_find_unused_parameters_true'
+      #strategy: 'auto'
+      num_sanity_val_steps: 0
+      accumulate_grad_batches: 16
+      log_every_n_steps: 1
+      check_val_every_n_epoch: 1
+      gradient_clip_val: 0.01
+      enable_progress_bar: True
+      #logger: False
+      logger:
+       _target_: lightning.pytorch.loggers.WandbLogger
+       project: neural-laplacian
+       save_dir: 'wandb'
+       log_model: 'all'
+      callbacks:
+        - _target_: lightning.pytorch.callbacks.ModelCheckpoint
+          dirpath: "./checkpoints"
+          filename: "model-{epoch:010d}-{ReconstructionLoss:.4f}"
+      #    monitor: "val/ReconstructionLoss"
+      #    mode: "min"
+          save_top_k: -1
+          every_n_epochs: 1
+          verbose: False
+          save_on_train_epoch_end: True

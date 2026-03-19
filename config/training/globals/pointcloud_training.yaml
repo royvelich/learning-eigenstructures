@@ -1,0 +1,3 @@
+seed: 60
+eigenvectors_count: 50
+ckpt_path: null

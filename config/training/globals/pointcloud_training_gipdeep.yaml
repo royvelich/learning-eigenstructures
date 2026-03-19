@@ -1,0 +1,8 @@
+seed: 6
+eigenvectors_count: 20
+num_neighbors: 50
+smoothing_num_neighbors: 20
+gnn_num_neighbors: 20
+normal_num_neighbors: 20
+feature_num_neighbors: 20
+ckpt_path: null

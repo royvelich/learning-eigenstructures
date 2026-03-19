@@ -1,0 +1,4 @@
+seed: 6
+eigenvectors_count: 50
+ckpt_path: null
+operator: null

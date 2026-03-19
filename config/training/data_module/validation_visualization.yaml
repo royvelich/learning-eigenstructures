@@ -1,0 +1,62 @@
+module:
+  _target_: neural_laplacian.data_modules.DataModule
+  train_dataset_specification:
+    _target_: neural_laplacian.data_modules.DatasetSpecification
+    dataset:
+      _target_: neural_laplacian.datasets.PointCloudDataset
+      cache_dir: './eigen_cache2'
+      include_faces: True
+      num_eigenfunctions: ${globals.eigenvectors_count}
+      files_path_cache: null
+      name: null
+      gaussian_noise_config: null
+#      gaussian_noise_config:
+#        _target_: neural_laplacian.configs.GaussianNoiseConfig
+#        mean: 0.0
+#        std: 0.05
+      remeshing_config: null
+      scalar_field_config:
+        _target_: neural_laplacian.configs.ScalarFieldConfig
+        generators:
+          - _target_: neural_laplacian.generators.UniformFieldGenerator
+            min_val_range: [-1, 1]
+            max_val_range: null
+            num_fields: 3000
+      max_items: 3000
+      file_size: [0, 15]
+      farthest_point_sampling_config: null
+#      farthest_point_sampling_config:
+#        _target_: neural_laplacian.configs.FarthestPointSamplingConfig
+#        samples: 1500
+#        random_start: True
+#      decimation_config: null
+      decimation_config:
+        _target_: neural_laplacian.configs.DecimationConfig
+        target_perc_range: null
+        quality_thr_range: 0.3
+        target_face_num_range: 2000
+        preserve_boundary: True
+        preserve_normal: True
+        preserve_topology: True
+        optimal_placement: True
+        planar_quadric: True
+      root_dirs:
+#        - _target_: pathlib.Path
+#          _args_: ["./assets/elephant-poses"]
+#        - _target_: pathlib.Path
+#          _args_: ["./assets/horse-poses"]
+#        - _target_: pathlib.Path
+#          _args_: ["F:/input/Thingi10K"]
+        - _target_: pathlib.Path
+          _args_: ["./assets/mpz14"]
+#        - _target_: pathlib.Path
+#          _args_: ["F:/input/shrec07_volumetric"]
+#        - _target_: pathlib.Path
+#          _args_: ["F:/input/shrec20b"]
+    batch_size: 1
+    num_workers: 0
+    shuffle: False
+    drop_last: False
+    persistent_workers: False
+    pin_memory: False
+  val_dataset_specifications: null

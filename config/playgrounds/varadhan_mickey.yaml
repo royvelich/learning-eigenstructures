@@ -1,0 +1,37 @@
+# Simple configuration for varadhan_playground.py
+# Place this in ./config/playgrounds/varadhan_simple.yaml
+
+# Data configuration
+data:
+  path: "./validation_data/mickey"  # Path to the validation dataset
+
+# Varadhan formula parameters
+varadhan:
+  source_idx: 0         # Index of source vertex (single fixed source)
+
+  # Predicted distances parameters
+  predicted:
+    initial_t: 1.0        # Initial time parameter for predicted
+    min_t: 0.1           # Minimum time value for predicted slider
+    max_t: 100.0            # Maximum time value for predicted slider
+    max_eigenvectors: 100  # Initial number of eigenvectors for predicted
+
+  # Ground truth distances parameters
+  gt:
+    initial_t: 0.01        # Initial time parameter for GT
+    min_t: 1e-6           # Minimum time value for GT slider
+    max_t: 1.0            # Maximum time value for GT slider
+    max_eigenvectors: 100  # Initial number of eigenvectors for GT
+
+  # Random baseline distances parameters
+  random:
+    initial_t: 0.01        # Initial time parameter for random baseline
+    min_t: 0.01           # Minimum time value for random slider
+    max_t: 10.0            # Maximum time value for random slider
+    max_eigenvectors: 100  # Initial number of eigenvectors for random baseline
+
+
+# Visualization settings
+visualization:
+  point_radius: 0.005
+  source_radius: 0.01

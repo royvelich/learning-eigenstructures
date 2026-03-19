@@ -1,0 +1,68 @@
+# Define base dataset configuration
+_dataset_: &exp_dataset_config
+  _target_: neural_laplacian.datasets.PointCloudDataset
+  num_eigenfunctions: ${globals.eigenvectors_count}
+  files_path_cache: null
+  name: null
+  cache_dir: "./eigen_cache/overfit_validation"
+  scalar_field_config:
+    _target_: neural_laplacian.configs.ScalarFieldConfig
+    generators:
+      - _target_: neural_laplacian.generators.UniformFieldGenerator
+        min_val_range: [-1, 1]
+        max_val_range: null
+        num_fields: 1000
+  gaussian_noise_config: null
+  decimation_config: null
+  remeshing_config: null
+  operator_config: null
+
+_exp_train_dataset_config_: &exp_train_dataset_config
+  <<: *exp_dataset_config
+  max_items: 1
+  file_size: [0, 15]
+#  farthest_point_sampling_config: null
+  farthest_point_sampling_config:
+    _target_: neural_laplacian.configs.FarthestPointSamplingConfig
+    samples: 2500
+    random_start: True
+  decimation_config: null
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["${globals.mesh_path}"]
+
+_exp_val_dataset_config_: &exp_val_dataset_config
+  <<: *exp_dataset_config
+  max_items: 1
+  file_size: [0, 15]
+#  farthest_point_sampling_config: null
+  farthest_point_sampling_config:
+    _target_: neural_laplacian.configs.FarthestPointSamplingConfig
+    samples: 2500
+    random_start: True
+  decimation_config: null
+  root_dirs:
+    - _target_: pathlib.Path
+      _args_: ["${globals.mesh_path}"]
+
+# Main DataModule configuration
+module:
+  _target_: neural_laplacian.data_modules.DataModule
+  train_dataset_specification:
+    _target_: neural_laplacian.data_modules.DatasetSpecification
+    dataset: *exp_train_dataset_config
+    batch_size: 1
+    num_workers: 0
+    shuffle: True
+    persistent_workers: False
+    pin_memory: False
+    drop_last: True
+  val_dataset_specifications:
+    - _target_: neural_laplacian.data_modules.DatasetSpecification
+      dataset: *exp_val_dataset_config
+      batch_size: 1
+      num_workers: 0
+      shuffle: False
+      persistent_workers: False
+      pin_memory: False
+      drop_last: True
